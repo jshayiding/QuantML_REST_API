@@ -1,0 +1,380 @@
+openapi: 3.0.0
+info:
+  title: ImmunoMatch
+  description: ImmunoMatch API documentation for use with Immunix ED
+  contact:
+    name: Prenosis
+    url: http://www.prenosis.com
+    email: info@prenosis.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: /api/v1/
+  description: ImmunoEd API Service
+security:
+- api_key: []
+paths:
+  /immunomatch_ed:
+    post:
+      summary: ImmunoMatch ED Execution interface
+      description: Endpoint will return the output of the ImmunoMatch ED algoritm
+        Machine Learning algorithm.
+      operationId: immunomatch_ed_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/immunomatch_ed_input'
+        required: true
+      responses:
+        "200":
+          description: ImmunoMatch Algorithm Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immunomatch_ed_output'
+        "401":
+          description: Authorization information is missing or invalid.
+      x-openapi-router-controller: imm_server.controllers.default_controller
+  /about:
+    get:
+      summary: ImmunoMatch System Version
+      description: Obtain current version of ImmunoMatch
+      operationId: about_get
+      responses:
+        "200":
+          description: About information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/version'
+        "401":
+          description: Authorization information is missing or invalid.
+      x-openapi-router-controller: imm_server.controllers.default_controller
+  /rsession:
+    get:
+      summary: Collect Information About The Current R Session
+      description: Obtain r sessionInfo()
+      operationId: rsession_get
+      responses:
+        "200":
+          description: sessionInfo
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+              example: RSession
+        "401":
+          description: Authorization information is missing or invalid.
+      x-openapi-router-controller: imm_server.controllers.default_controller
+  /log:
+    get:
+      summary: Return log
+      operationId: log_get
+      parameters:
+      - name: type
+        in: query
+        description: log name
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - combined
+          - error
+          - rlog
+      responses:
+        "200":
+          description: Return log
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        "401":
+          description: Authorization information is missing or invalid.
+      x-openapi-router-controller: imm_server.controllers.default_controller
+components:
+  schemas:
+    version:
+      required:
+      - mayor
+      - minor
+      - name
+      - patch
+      type: object
+      properties:
+        name:
+          type: string
+        mayor:
+          type: number
+        minor:
+          type: number
+        patch:
+          type: number
+      description: ImmunoMatch Version
+      example:
+        name: ImmunoMatch
+        mayor: 1
+        minor: 0
+        patch: 0
+    immunomatch_ed_input:
+      required:
+      - features
+      - organization
+      - patient
+      - time
+      - version
+      type: object
+      properties:
+        version:
+          type: string
+        patient:
+          type: string
+        organization:
+          type: string
+        time:
+          type: string
+          format: date
+        features:
+          $ref: '#/components/schemas/immunomatch_ed_input_features'
+      description: Input to ImmunoMatch ED
+      example:
+        version: 0
+        patient: SUBJECT1000
+        organization: HOSP
+        time: {}
+        features:
+          age: 52
+          gender: M
+          IL6:
+            value: 2
+            time: {}
+          PCT:
+            value: 1
+            time: {}
+          CRP:
+            value: 10
+            time: {}
+    immunomatch_ed_input_features:
+      required:
+      - age
+      - gender
+      type: object
+      properties:
+        age:
+          type: integer
+        gender:
+          type: string
+          enum:
+          - M
+          - F
+        systolicbp:
+          $ref: '#/components/schemas/feature_data_in'
+        diastolicbp:
+          $ref: '#/components/schemas/feature_data_in'
+        heartrate:
+          $ref: '#/components/schemas/feature_data_in'
+        pulseoximetry:
+          $ref: '#/components/schemas/feature_data_in'
+        respiratoryrate:
+          $ref: '#/components/schemas/feature_data_in'
+        temperature:
+          $ref: '#/components/schemas/feature_data_in'
+        monocyte:
+          $ref: '#/components/schemas/feature_data_in'
+        neutrophil:
+          $ref: '#/components/schemas/feature_data_in'
+        wbc:
+          $ref: '#/components/schemas/feature_data_in'
+        platelets:
+          $ref: '#/components/schemas/feature_data_in'
+        albumin:
+          $ref: '#/components/schemas/feature_data_in'
+        bilirubin:
+          $ref: '#/components/schemas/feature_data_in'
+        bun:
+          $ref: '#/components/schemas/feature_data_in'
+        creatinine:
+          $ref: '#/components/schemas/feature_data_in'
+        glucose:
+          $ref: '#/components/schemas/feature_data_in'
+        potassium:
+          $ref: '#/components/schemas/feature_data_in'
+        sodium:
+          $ref: '#/components/schemas/feature_data_in'
+        lactate:
+          $ref: '#/components/schemas/feature_data_in'
+        gcstotal:
+          $ref: '#/components/schemas/feature_data_in'
+        pct:
+          $ref: '#/components/schemas/feature_data_in'
+        il6:
+          $ref: '#/components/schemas/feature_data_in'
+        crp:
+          $ref: '#/components/schemas/feature_data_in'
+      description: Features used for ImmunoMatch ED
+    feature_data_in:
+      required:
+      - time
+      - units
+      - value
+      type: object
+      properties:
+        value:
+          type: integer
+          format: int32
+        units:
+          type: string
+        time:
+          type: string
+          description: Time of sample results for Lab, or measurement time for other.
+          format: date-time
+        device:
+          type: string
+          description: Description of device used to collect an specific lab. (e.g.
+            roche_cobas)
+      description: Single descriptor of a machine learning feature
+      example:
+        value: 12
+        units: pg/ml
+        time: 2018-02-10T09:30Z
+        device: roche_cobas
+    immunomatch_ed_output:
+      required:
+      - features_used
+      - guidance
+      - immunoscore
+      - readiness_flag
+      - risk_category
+      type: object
+      properties:
+        immunoscore:
+          type: integer
+          description: ImmunoScore Value
+        risk_category:
+          type: string
+          description: Risk Category
+          enum:
+          - low
+          - medium
+          - high
+        guidance:
+          type: string
+          description: Text with guidance for provider associated with risk category
+        readiness_flag:
+          type: boolean
+          description: Flag that turns true if the immunoscore value is ready to be
+            displayed and used. In the flag is false, the immonoscore is too inaccurate.
+        features_used:
+          type: array
+          description: Array of features used for algorithm.
+          items:
+            $ref: '#/components/schemas/feature_data_out'
+      description: ImmunoMatch ED output
+      example:
+        immunoscore: 0
+        risk_category: low
+        guidance: string
+        readiness_flag: true
+        features_used:
+        - name: PCT
+          value: 11000
+          range_value:
+          - 10
+          - 1000
+          - 10000
+          - 20000
+          range_frequency:
+          - 80
+          - 15
+          - 2
+          - 1
+          importance: 1
+        - name: IL6
+          value: 500
+          range_value:
+          - 10
+          - 1000
+          - 3000
+          range_frequency:
+          - 85
+          - 10
+          - 5
+          importance: 2
+    feature_data_out:
+      required:
+      - importance
+      - inrange
+      - name
+      - ranges
+      - units
+      - value
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: integer
+          format: int32
+        units:
+          type: string
+        inrange:
+          type: string
+          description: Value with respect to range
+          enum:
+          - low
+          - normal
+          - high
+        importance:
+          type: integer
+          description: Feature importance in algorithm. The lower the more important
+            the value.
+        ranges:
+          type: array
+          description: Array defining the normal population in the form of a histogram.
+          items:
+            $ref: '#/components/schemas/value_vs_freq'
+      description: Feature used by algoritm and associated information
+      example:
+        name: PCT
+        value: 63
+        inrange: low
+        units: pg/ml
+        range_value:
+        - 95.51
+        - 85.6
+        - 110
+        range_frequency:
+        - 57
+        - 38
+        - 10
+        importance: 7
+    value_vs_freq:
+      required:
+      - freq
+      - value
+      type: object
+      properties:
+        value:
+          type: number
+        freq:
+          type: number
+      description: Vector of (Value,Freq) used in describing the range of values in
+        a population. It can be read as, for the Value, there are Freq cases in the
+        population. An array of several of these will define a range in the form of
+        histogram of values for a population.
+      example:
+        value: 86.01
+        freq: 54.16
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-Auth
+      in: header
+      x-apikeyInfoFunc: imm_server.controllers.authorization_controller.check_api_key
+
