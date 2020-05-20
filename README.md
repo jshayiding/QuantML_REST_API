@@ -1,15 +1,9 @@
-<<<<<<< HEAD
-# imm_python_server
-mmunoMatch REST API
+# covid19_python_server
+Covid19 Prognostic Analysis - REST API
 =======
-<<<<<<< HEAD
-# imm_python_server
-mmunoMatch REST API
-=======
-# Swagger generated server
 
 ## Overview
-This server is used for prenosis machine learning solution for sepsis analysis
+This server is used for machine learning solution for diagonsing covid19 patients' biomarker RNA datasets
 
 ## Requirements
 Python 3.5.2+
@@ -54,5 +48,3 @@ docker build -t imm_server .
 # starting up a container
 docker run -p 8080:8080 imm_server
 ```
->>>>>>> development version of imm_python_server REST API
->>>>>>> development version of imm_python_server REST API
