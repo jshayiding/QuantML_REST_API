@@ -1,9 +1,9 @@
-# covid19_python_server
-Covid19 Prognostic Analysis - REST API
+# quantML_python_server
+Quant ML - REST API
 =======
 
 ## Overview
-This server is used for machine learning solution for diagonsing covid19 patients' biomarker RNA datasets
+This server is used for machine learning solution for forcasting trade trend
 
 ## Requirements
 Python 3.5.2+
